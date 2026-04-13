@@ -1,0 +1,20 @@
+[project]
+name = "sandbox-seed"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "ldap3==2.9.1",
+  "python-keycloak==4.2.0",
+  "pyyaml==6.0.2",
+  "tenacity==8.5.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.2"]
+
+[project.scripts]
+sandbox-seed = "seed.main:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
