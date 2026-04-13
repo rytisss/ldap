@@ -93,12 +93,18 @@ curl -s -H "Authorization: Bearer $TOKEN" \
 
 **Test login:** http://localhost:8080/realms/sandbox/account — log in as the user.
 
-## Verifying a user in LDAP
+## Listing users in LDAP
+
+All users (single line — safe to paste into any shell):
 
 ```bash
-docker compose exec openldap ldapsearch -x \
-  -D "cn=admin,dc=sandbox,dc=local" -w admin \
-  -b "ou=people,dc=sandbox,dc=local" "(uid=alice)"
+docker compose exec openldap ldapsearch -x -LLL -D "cn=admin,dc=sandbox,dc=local" -w admin -b "ou=people,dc=sandbox,dc=local" "(objectClass=inetOrgPerson)" uid cn mail
+```
+
+A specific user:
+
+```bash
+docker compose exec openldap ldapsearch -x -LLL -D "cn=admin,dc=sandbox,dc=local" -w admin -b "ou=people,dc=sandbox,dc=local" "(uid=alice)"
 ```
 
 ## Running tests
