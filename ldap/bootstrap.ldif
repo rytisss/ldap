@@ -1,0 +1,7 @@
+dn: ou=people,dc=sandbox,dc=local
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=sandbox,dc=local
+objectClass: organizationalUnit
+ou: groups

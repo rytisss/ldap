@@ -1,0 +1,65 @@
+services:
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: sandbox-openldap
+    environment:
+      LDAP_ORGANISATION: ${LDAP_ORGANIZATION}
+      LDAP_DOMAIN: ${LDAP_DOMAIN}
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD}
+    ports:
+      - "389:389"
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+      - ./ldap:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro
+    command: ["--copy-service"]
+
+  postgres:
+    image: postgres:16
+    container_name: sandbox-postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: sandbox-keycloak
+    depends_on: [postgres]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      KC_HOSTNAME: localhost
+      KC_HTTP_ENABLED: "true"
+    command: ["start-dev"]
+    ports:
+      - "8080:8080"
+
+  seed:
+    build: ./seed
+    container_name: sandbox-seed
+    depends_on: [openldap, keycloak]
+    environment:
+      LDAP_URL: ldap://openldap:389
+      LDAP_BASE_DN: ${LDAP_BASE_DN}
+      LDAP_ADMIN_DN: cn=admin,${LDAP_BASE_DN}
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      KC_URL: http://keycloak:8080
+      KC_ADMIN_USER: ${KC_BOOTSTRAP_ADMIN_USERNAME}
+      KC_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      KC_REALM: ${KC_REALM}
+    volumes:
+      - ./seed:/app:ro
+    profiles: ["seed"]
+
+volumes:
+  ldap_data:
+  ldap_config:
+  pg_data:
