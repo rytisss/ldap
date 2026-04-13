@@ -5,6 +5,10 @@ def ensure_realm(admin: KeycloakAdmin, realm: str) -> None:
     existing = [r["realm"] for r in admin.get_realms()]
     if realm not in existing:
         admin.create_realm({"realm": realm, "enabled": True})
+    # Allow plain HTTP access from any host (sandbox only).
+    for r in ("master", realm):
+        admin.connection.realm_name = r
+        admin.update_realm(r, {"sslRequired": "NONE"})
     admin.connection.realm_name = realm
 
 
