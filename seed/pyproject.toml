@@ -5,6 +5,7 @@ requires-python = ">=3.12"
 dependencies = [
   "ldap3==2.9.1",
   "python-keycloak==4.2.0",
+  "httpx<0.28",
   "pyyaml==6.0.2",
   "tenacity==8.5.0",
 ]
