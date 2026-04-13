@@ -17,8 +17,12 @@ def ensure_ldap_federation(
     admin_password: str,
 ) -> str:
     admin.connection.realm_name = realm
+    # Keycloak stores `parentId` as the realm's internal UUID, not the realm name.
+    # A string realm name here creates an orphaned component that federation search skips.
+    realm_uuid = admin.get_realm(realm)["id"]
+
     components = admin.get_components(
-        query={"type": "org.keycloak.storage.UserStorageProvider"}
+        query={"parent": realm_uuid, "type": "org.keycloak.storage.UserStorageProvider"}
     )
     for c in components:
         if c["name"] == "ldap":
@@ -28,7 +32,7 @@ def ensure_ldap_federation(
         "name": "ldap",
         "providerId": "ldap",
         "providerType": "org.keycloak.storage.UserStorageProvider",
-        "parentId": realm,
+        "parentId": realm_uuid,
         "config": {
             "enabled": ["true"],
             "editMode": ["WRITABLE"],
