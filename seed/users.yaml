@@ -1,0 +1,17 @@
+users:
+  - uid: alice
+    cn: Alice Anderson
+    sn: Anderson
+    mail: alice@sandbox.local
+    password: changeme
+    groups: [developers]
+  - uid: bob
+    cn: Bob Brown
+    sn: Brown
+    mail: bob@sandbox.local
+    password: changeme
+    groups: [admins]
+
+groups:
+  - developers
+  - admins
